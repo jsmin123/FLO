@@ -1,0 +1,1 @@
+from media.BS import naver_bs

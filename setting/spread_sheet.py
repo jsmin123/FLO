@@ -3,6 +3,7 @@ import gspread
 import pandas as pd
 from setting.directory import *
 from setting.auth import *
+from setting.report_date import *
 
 def spread_document_read(spread_url):
     scope = ['https://spreadsheets.google.com/feeds',
@@ -26,6 +27,25 @@ def spread_sheet(doc, sheet_name, col_num):
 def index_sheet():
     index = spread_sheet(doc, sheet_name = 'INDEX', col_num = 0)
     return index
+
+def naver_bs_sheet():
+    sheet = spread_sheet(doc, sheet_name = 'Naver BS', col_num = 0)
+    return sheet
+
+def sub_media_raw_data_read():
+    dashboard = spread_sheet(doc,sheet_name='매체별 RD ▶', col_num = 0)
+    operating_media = dashboard.loc[dashboard[day_1_yearmonth]=='TRUE', '매체'].tolist()
+
+    result = pd.DataFrame()
+    for media in operating_media :
+        data = spread_sheet(doc, media, 0)
+        data = data.loc[pd.notnull(data['날짜'])]
+        data = data.loc[pd.to_datetime(data['날짜']).dt.month==day_1.month]
+        data['매체'] = media
+        result = pd.concat([result, data], sort= False)
+
+    return result
+
 
 
 
